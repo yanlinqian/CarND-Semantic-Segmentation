@@ -9,6 +9,7 @@ import time
 import tensorflow as tf
 from glob import glob
 from urllib.request import urlretrieve
+# from urllib import urlretrieve
 from tqdm import tqdm
 
 
@@ -73,8 +74,7 @@ def gen_batch_function(data_folder, image_shape):
         """
         image_paths = glob(os.path.join(data_folder, 'image_2', '*.png'))
         label_paths = {
-            re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path
-            for path in glob(os.path.join(data_folder, 'gt_image_2', '*_road_*.png'))}
+            re.sub(r'_(lane|road)_', '_', os.path.basename(path)): path for path in glob(os.path.join(data_folder, 'gt_image_2', '*_road_*.png'))}
         background_color = np.array([255, 0, 0])
 
         random.shuffle(image_paths)
@@ -88,7 +88,10 @@ def gen_batch_function(data_folder, image_shape):
                 gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
 
                 gt_bg = np.all(gt_image == background_color, axis=2)
-                gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+                #gt_bg = gt_bg.reshape(*gt_bg.shape, 1)
+                gt_bg = gt_bg.reshape(*gt_bg.shape); gt_bg=gt_bg[:,:,np.newaxis]
+                #print gt_bg.shape
+
                 gt_image = np.concatenate((gt_bg, np.invert(gt_bg)), axis=2)
 
                 images.append(image)
